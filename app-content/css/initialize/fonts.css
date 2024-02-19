@@ -1,0 +1,15 @@
+
+@font-face {
+    font-family: Nunito;
+    src: url("../fonts/Nunito.ttf");
+}
+
+@font-face {
+    font-family: Teko;
+    src: url("../fonts/Teko.ttf");
+}
+
+:root {
+    --theme-font: Teko, sans-serif;
+    --default-font: Nunito, sans-serif;
+}

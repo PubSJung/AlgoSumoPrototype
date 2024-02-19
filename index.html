@@ -8,9 +8,12 @@
     <link rel="shortcut icon" href="app-content/favicon.ico" type="image/x-icon">
     <link rel="icon" href="app-content/favicon.ico" type="image/x-icon">
 
+    <link rel="stylesheet" href="app-content/css/master.css">
     <link rel="stylesheet" href="app-frame/frame.css">
     
     <link rel="manifest" href="app-frame/app.webmanifest">
+
+    <script src="app-frame/host-select.js"> </script>
 
     <title> AlgorithmSumo (Prototype) </title>
 
@@ -24,14 +27,21 @@
 
     <div class="app-frame">
 
-        <div class="app-connect-header">
-            <label for="app-connect-host-select"> Choose a Host: </label>
-            <select name="app-connect-host-select" id="app-connect-host" required>
-                <option value="default"> Default </option>
-                <option value="fallback"> Fallback </option>
-                <option value="custom"> Custom </option>
-            </select>
-            <input type="url" placeholder="Hostname.." /> 
+        <div class="app-header">
+
+            <img class="app-logo" src="app-content/favicon.png" alt="AppLogo" />
+            <h1 class="app-label"> AlgorithmSumo </h1>
+
+            <div class="app-host">
+                <label for="app-host-select"> Host: </label>
+                <select name="app-host-select" id="app-host-select" required>
+                    <option value="default" selected> Default </option>
+                    <option value="fallback"> Fallback </option>
+                    <option value="custom"> Custom </option>
+                </select>
+                <input type="url" placeholder="Hostname.." id="app-host-custom" /> 
+            </div>
+
         </div>
 
         <iframe class="app-content"> </iframe>

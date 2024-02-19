@@ -4,18 +4,61 @@ body {
     overflow: hidden;
 }
 
-.app-connect-header {
+.app-header {
+
+    display: inline-flex;
 
     position: sticky;
     left: 0;
     top: 0;
-    right: 0;
-    height: 2em;
-
-    background-color: #0008;
-    backdrop-filter: blur(4px);
+    width: 100%;
+    height: 3em;
     z-index: 1;
 
+    box-shadow: 0 0.5em 2em #000B;
+    border-bottom: #000B thin solid;
+    background-color: #0008;
+    backdrop-filter: blur(4px);
+
+}
+
+.app-header .app-logo {
+    height: 100%;
+}
+
+.app-header .app-label {
+    color: #6C9;
+    text-shadow: 0 0 4px #396;
+    margin: 0.125em 0.25em;
+    text-decoration: underline;
+}
+
+.app-header .app-host {
+    display: inline-block;
+    position: absolute;
+    left: 100%;
+    height: 100%;
+    transform: translateX(-100%);
+    background-color: #0004;
+}
+
+.app-header .app-host label {
+    margin: 0 0.5em;
+}
+
+.app-header .app-host select {
+    height: calc(50% - 0.25em);
+}
+
+.app-header .app-host input {
+    margin-top: 0.125em;
+    display: none;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.app-header .app-host input.shown {
+    display: block;
 }
 
 .app-content {
@@ -24,4 +67,5 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
+    z-index: 0;
 }
