@@ -1,0 +1,21 @@
+{
+    "name": "AlgorithmSumoPrototype",
+    "short_name": "PreAlgoSumo",
+    "start_url": "/",
+    "background_color": "#333339",
+    "theme_color": "#33FF99",
+    "display": "standalone",
+    "capture_links": "existing-client-navigate",
+    "icons": [
+        {
+            "path": "favicon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "path": "favicon.ico",
+            "sizes": "256x256",
+            "type": "image/x-icon"
+        }
+    ]
+}

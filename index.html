@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="app-content/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="app-content/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="app-frame/frame.css">
+    
+    <link rel="manifest" href="app-frame/app.webmanifest">
+
+    <title> AlgorithmSumo (Prototype) </title>
+
+</head>
+<body>
+
+    <script>
+        if("serviceWorker" in navigator)
+        navigator.serviceWorker.register("app-frame/service.js");
+    </script>
+
+    <div class="app-frame">
+
+        <div class="app-connect-header">
+            <label for="app-connect-host-select"> Choose a Host: </label>
+            <select name="app-connect-host-select" id="app-connect-host" required>
+                <option value="default"> Default </option>
+                <option value="fallback"> Fallback </option>
+                <option value="custom"> Custom </option>
+            </select>
+            <input type="url" placeholder="Hostname.." /> 
+        </div>
+
+        <iframe class="app-content"> </iframe>
+
+    </div>
+
+</body>
+</html>
