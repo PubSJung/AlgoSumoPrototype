@@ -4,15 +4,49 @@ const FALLBACK_HOST = "";
 
 var appFrame;
 var appHost;
+var appEndpointValidation;
 
-function selectAppHost(host) {
+async function validateAppEndpoint() {
+
+    var response = await fetch(appHost + "/app-endpoint-validation.json", {
+        "method": "GET"
+    });
+    if(response.status < 200 || response.status > 299)
+    return false;
+
+    var json = await response.json();
+    return (json && json.key && json.key == appEndpointValidation.key);
+
+}
+
+async function selectAppHost(host) {
+
     appHost = host;
-    if(appFrame) {
-        appFrame.src = host + "/newgame"
+    var valid = await validateAppEndpoint();
+
+    if(appFrame && valid) {
+
+        if(!appFrame.classList.contains("app-host-loaded"))
+        appFrame.classList.add("app-host-loaded");
+
+        appFrame.src = host + "/lobby?create=true";
+
+    } else {
+        if(appFrame.classList.contains("app-host-loaded"))
+        appFrame.classList.remove("app-host-loaded");
     }
+
 }
 
 window.addEventListener("load", () => {
+
+    fetch("app-content/app-endpoint-validation.json", {
+        "method": "GET"
+    })
+        .then((data) => data.json())
+        .then((json) => {
+            appEndpointValidation = json;
+        });
 
     appFrame = document.body.querySelector("iframe.app-content");
 
@@ -36,7 +70,6 @@ window.addEventListener("load", () => {
 
             default:
                 selectAppHost(DEFAULT_HOST);
-        
 
         }
 

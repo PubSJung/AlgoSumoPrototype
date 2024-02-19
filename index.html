@@ -9,8 +9,8 @@
     <link rel="icon" href="app-content/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="app-content/css/master.css">
-    <link rel="stylesheet" href="app-frame/frame.css">
     
+    <link rel="stylesheet" href="app-frame/app-frame.css">
     <link rel="manifest" href="app-frame/app.webmanifest">
 
     <script src="app-frame/host-select.js"> </script>
@@ -22,7 +22,7 @@
 
     <script>
         if("serviceWorker" in navigator)
-        navigator.serviceWorker.register("app-frame/service.js");
+        navigator.serviceWorker.register("app-frame/service-worker.js");
     </script>
 
     <div class="app-frame">

@@ -8,6 +8,7 @@
 
     color: var(--theme-color);
     border-color: var(--shadow-color);
+    border-radius: 0.25em;
 
     outline: none;
 
