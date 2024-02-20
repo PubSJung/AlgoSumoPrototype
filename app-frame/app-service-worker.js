@@ -8,12 +8,13 @@ self.addEventListener("install", (ev) => {
                 "/app-content/favicon.ico",
                 "/app-content/css/fonts/Nunito.ttf",
                 "/app-content/css/fonts/Teko.ttf",
-                "/app-content/css/initialize/colors.css",
-                "/app-content/css/initialize/fonts.css",
+                "/app-content/css/theme/defaults/colors.css",
+                "/app-content/css/theme/defaults/fonts.css",
+                "/app-content/css/theme/bright-theme.css",
                 "/app-content/css/master.css",
 
                 "/app-frame/app-frame.css",
-                "/app-frame/host-select.js",
+                "/app-frame/app-frame.js",
 
                 "/"
 

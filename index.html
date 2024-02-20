@@ -7,13 +7,14 @@
 
     <link rel="shortcut icon" href="app-content/favicon.ico" type="image/x-icon">
     <link rel="icon" href="app-content/favicon.ico" type="image/x-icon">
-
     <link rel="stylesheet" href="app-content/css/master.css">
-    
+
+    <link rel="stylesheet" class="app-theme-linker">
+
+    <script src="app-frame/app-frame.js"> </script>
+
     <link rel="stylesheet" href="app-frame/app-frame.css">
     <link rel="manifest" href="app-frame/app.webmanifest">
-
-    <script src="app-frame/host-select.js"> </script>
 
     <title> AlgorithmSumo (Prototype) </title>
 
@@ -22,7 +23,7 @@
 
     <script>
         if("serviceWorker" in navigator)
-        navigator.serviceWorker.register("app-frame/service-worker.js");
+        navigator.serviceWorker.register("app-frame/app-service-worker.js");
     </script>
 
     <div class="app-frame">
@@ -32,21 +33,39 @@
             <img class="app-logo" src="app-content/favicon.png" alt="AppLogo" />
             <h1 class="app-label"> AlgorithmSumo </h1>
 
+            <div class="app-user">
+                <h3> User: </h3>
+                <input id="app-user-name" placeholder="Name" type="text" />
+            </div>
+
+            <div id="app-lobby" class="app-lobby hide">
+                <h3> Lobby: </h3>
+                <input id="app-lobby-name" placeholder="Name" type="text" />
+                <input id="app-lobby-password" placeholder="Password (optional)" type="password" />
+            </div>
+            
+            <button type="button" id="app-request-access" class="app-request hide"> Request Lobby! </button>
+
             <div class="app-host">
                 <label for="app-host-select"> Host: </label>
                 <select name="app-host-select" id="app-host-select" required>
                     <option value="default" selected> Default </option>
                     <option value="fallback"> Fallback </option>
+                    <option value="local"> Local </option>
                     <option value="custom"> Custom </option>
                 </select>
-                <input type="url" placeholder="Hostname.." id="app-host-custom" /> 
+                <input type="url" placeholder="Hostname.." id="app-host-custom" class="hide" /> 
             </div>
 
         </div>
 
         <iframe class="app-content"> </iframe>
 
+        <div id="app-bright-mode" class="app-bright-theme-toggle"> </div>
+
     </div>
+
+    <script async src="https://cdn.jsdelivr.net/npm/js-sha256@0.11.0/src/sha256.min.js"> </script>
 
 </body>
 </html>

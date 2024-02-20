@@ -2,6 +2,19 @@
 body {
     margin: 0;
     overflow: hidden;
+    transition: background-color 200ms ease,
+                color 400ms ease;
+}
+
+body *:first-child {
+    margin: 0 !important;
+}
+
+.app-frame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 -0.5em 3em var(--theme-shadow-color);
 }
 
 .app-header {
@@ -9,21 +22,23 @@ body {
     display: inline-flex;
 
     position: sticky;
-    left: 0;
-    top: 0;
-    width: 100%;
+    left: 0.5em;
+    top: 0.5em;
+    width: calc(100% - 1em);
     height: 4em;
     z-index: 1;
 
-    box-shadow: 0 0.5em 2em #000B;
-    border-bottom: #000B thin solid;
+    box-shadow: 0 0.25em 1.5em var(--accent-shadow-color);
+    border-bottom: var(--accent-color) thin solid;
     background-color: #0008;
+    background-image: linear-gradient(45deg, var(--accent-shadow-color), #0008);
     backdrop-filter: blur(4px);
 
 }
 
 .app-header .app-logo {
     height: 100%;
+    filter: drop-shadow(0 0 0.25em var(--shadow-color));
 }
 
 .app-header .app-label {
@@ -38,10 +53,6 @@ body {
     left: calc(100% - 0.5em);
     height: calc(100% - 0.5em);
     transform: translateX(-100%);
-    background-color: #0004;
-    padding: 0 2em;
-    margin: 0.25em;
-    border-radius: 0.5em;
 }
 
 .app-header .app-host label {
@@ -49,20 +60,58 @@ body {
 }
 
 .app-header .app-host select {
-    margin-top: 0.5em;
+    margin-top: 0.125em;
     padding: 0.125em;
     border-radius: 0.5em;
+    font-size: 1em;
+    background-color: #444;
 }
 
 .app-header .app-host input {
     margin-top: 0.125em;
-    display: none;
     border-width: 1px;
+    border-style: solid;
+    background-color: #444;
+}
+
+.app-header .app-lobby,
+.app-header .app-host,
+.app-header .app-user {
+    background-color: #0004;
+    padding: 0 0.5em;
+    margin: 0.25em;
+    border-radius: 0.5em;
+    border: var(--accent-shadow-color) thin solid;
+}
+
+.app-header .app-lobby *,
+.app-header .app-user * {
+    margin: 0;
+}
+
+.app-header .app-request {
+    font-size: 1em;
+    margin: 0.5em;
+    position: relative;
+    height: 75%;
+    padding: 0 1em;
+    cursor: pointer;
+}
+
+.app-header .app-request:hover {
+    background-color: #0004;
+}
+
+.app-header .app-request,
+.app-header .app-lobby input,
+.app-header .app-user input {
+    background-color: #0006;
+    border-color: var(--accent-color);
     border-style: solid;
 }
 
-.app-header .app-host input.shown {
-    display: block;
+.app-header .app-lobby *:last-child {
+    margin-left: 0.25em;
 }
 
 .app-content {
@@ -72,4 +121,25 @@ body {
     width: 100%;
     height: 100%;
     z-index: 0;
+}
+
+.app-bright-theme-toggle {
+    background-color: #AA44;
+    background-image: url("../app-content/img/bright_mode_sun.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: fixed;
+    right: 1em;
+    bottom: 1em;
+    width: 3em;
+    height: 3em;
+    cursor: pointer;
+    filter: saturate(0%) drop-shadow(0 0 1em);
+    transition: all 1s ease;
+    border-radius: 1em;
+}
+
+.app-bright-theme-toggle.app-bright-mode {
+    filter: drop-shadow(0 0 1em);
+    transition: all 1s ease;
 }

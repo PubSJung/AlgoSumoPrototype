@@ -1,13 +1,22 @@
 
+/*
+    Load & Creation of FontFaces
+*/
+
 @font-face {
     font-family: Nunito;
-    src: url("../fonts/Nunito.ttf");
+    src: url("../../fonts/Nunito.ttf");
 }
 
 @font-face {
     font-family: Teko;
-    src: url("../fonts/Teko.ttf");
+    src: url("../../fonts/Teko.ttf");
 }
+
+
+/*
+    Theme-Variables
+*/
 
 :root {
     --theme-font: Teko, sans-serif;

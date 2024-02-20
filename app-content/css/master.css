@@ -1,6 +1,6 @@
 
-@import url("initialize/colors.css");
-@import url("initialize/fonts.css");
+@import url("theme/defaults/colors.css");
+@import url("theme/defaults/fonts.css");
 
 * {
     
@@ -14,8 +14,6 @@
 
 }
 
-input,
-select,
 body {
     background-color: var(--fill-color);
 }
@@ -24,3 +22,6 @@ h1, h2, h3 {
     font-family: var(--theme-font);
 }
 
+.hide {
+    display: none;
+}
