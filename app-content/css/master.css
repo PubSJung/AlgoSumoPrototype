@@ -16,6 +16,7 @@
 
 body {
     background-color: var(--fill-color);
+    transition: background-color 400ms ease;
 }
 
 h1, h2, h3 {

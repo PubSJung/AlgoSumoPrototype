@@ -26,6 +26,7 @@ body *:first-child {
     top: 0.5em;
     width: calc(100% - 1em);
     height: 4em;
+    padding: 0.25em 0.125em;
     z-index: 1;
 
     box-shadow: 0 0.25em 1.5em var(--accent-shadow-color);
@@ -34,6 +35,31 @@ body *:first-child {
     background-image: linear-gradient(45deg, var(--accent-shadow-color), #0008);
     backdrop-filter: blur(4px);
 
+}
+
+.app-frame:has(.app-content[src]) .app-header {
+    display: none;
+}
+
+.app-header::before,
+.app-header::after {
+
+    display: block;
+    content: "";
+
+    position: absolute;
+    top: -0.4em;
+    left: -0.125em;
+    width: calc(100% + 0.25em);
+    height: 10%;
+    background-color: #0004;
+    border-radius: 0.5em;
+    filter: blur(4px);
+
+}
+
+.app-header::after {
+    top: 100%;
 }
 
 .app-header .app-logo {
@@ -50,20 +76,21 @@ body *:first-child {
 .app-header .app-host {
     display: inline-block;
     position: absolute;
-    left: calc(100% - 0.5em);
-    height: calc(100% - 0.5em);
+    left: calc(100% - 0.75em);
+    height: calc(100% - 1em);
     transform: translateX(-100%);
 }
 
 .app-header .app-host label {
     margin: 0 1em;
+    text-align: center;
 }
 
 .app-header .app-host select {
     margin-top: 0.125em;
     padding: 0.125em;
     border-radius: 0.5em;
-    font-size: 1em;
+    font-size: 0.8em;
     background-color: #444;
 }
 
@@ -72,6 +99,7 @@ body *:first-child {
     border-width: 1px;
     border-style: solid;
     background-color: #444;
+    font-size: 0.9em;
 }
 
 .app-header .app-lobby,
@@ -89,15 +117,6 @@ body *:first-child {
     margin: 0;
 }
 
-.app-header .app-request {
-    font-size: 1em;
-    margin: 0.5em;
-    position: relative;
-    height: 75%;
-    padding: 0 1em;
-    cursor: pointer;
-}
-
 .app-header .app-request:hover {
     background-color: #0004;
 }
@@ -107,7 +126,20 @@ body *:first-child {
 .app-header .app-user input {
     background-color: #0006;
     border-color: var(--accent-color);
-    border-style: solid;
+    border-style: groove;
+    text-indent: 0.25em;
+    font-size: 0.9em;
+    transform: translate(-0.1em, -0.2em);
+}
+
+.app-header .app-request {
+    font-size: 1em;
+    margin: 0.5em;
+    position: relative;
+    height: 75%;
+    padding: 0 1em;
+    cursor: pointer;
+    transform: none;
 }
 
 .app-header .app-lobby *:last-child {
@@ -134,9 +166,15 @@ body *:first-child {
     width: 3em;
     height: 3em;
     cursor: pointer;
-    filter: saturate(0%) drop-shadow(0 0 1em);
+    filter: saturate(0%) blur(1px) drop-shadow(0 0 1em);
     transition: all 1s ease;
     border-radius: 1em;
+    transform: translateY(85%);
+}
+
+.app-bright-theme-toggle:hover {
+    transform: none;
+    transition: all 1s ease;
 }
 
 .app-bright-theme-toggle.app-bright-mode {

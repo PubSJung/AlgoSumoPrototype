@@ -15,6 +15,7 @@ type ASServer struct {
 	Config          ASConfig
 	FileQueryRoutes []string
 	UserList        ASUserList
+	LobbyList       ASLobbyList
 	TLS             bool
 }
 
@@ -119,7 +120,7 @@ func (srv *ASServer) RegisterBackRoutes() {
 	srv.HandlePacketFunc("/user/push", srv.UserList.PushRouteHandler()).Methods("POST")
 	srv.HandlePacketFunc("/user/auth", srv.UserList.AuthRouteHandler()).Methods("POST")
 
-	srv.HandlePacketFunc("/lobby/request", nil /*srv.LobbyList.*/).Methods("GET")
+	srv.HandlePacketFunc("/lobby/request", srv.LobbyList.RequestRouteHandler()).Methods("POST")
 
 }
 

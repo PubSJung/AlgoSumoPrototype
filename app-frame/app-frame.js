@@ -20,9 +20,8 @@ var appEndpointObj = undefined;
 const APP = {
     host: localStorage.getItem("app-host"),
     latestAuthEncrypt: 255,
-    lobby: {
-        name: undefined,
-        password: undefined,
+    lobby: localStorage.getItem("app-lobby") || {
+        ulid: "99999999"
     },
     _username: localStorage.getItem("username"),
     get username() {
@@ -196,37 +195,94 @@ window.addEventListener("load", () => {
     userInputElem.value = APP.username;
     userInputElem.dispatchEvent(new Event("change"));
     
+    const appHeader = document.body.querySelector(".app-header");
+
     reqAccessElem.addEventListener("click", async () => {
-        var response = await fetch(APP.host + "/app-packets/lobby/request", {
+        const response = await fetch(APP.host + "/app-packets/lobby/request", {
             "method": "POST",
             "headers": {
                 "Content-Type": "application/json"
             },
             "body": JSON.stringify({
+                "username": APP.username,
                 "uuid": APP.uuid,
                 "authkey": APP.authkey,
-                "name": lobbyDefElem.querySelector("#app-lobby-name").value,
+                "ulid": APP.lobby.ulid,
+                "lobbyname": lobbyDefElem.querySelector("#app-lobby-name").value,
                 "password": lobbyDefElem.querySelector("#app-lobby-password").value
             })
         });
         if(response.status == 200) {
-
-        } else {
-            alert("An error occured while requesting access to the lobby!");
-        }
+            const json = await response.json();
+            console.log(json);
+            localStorage.setItem("app-lobby", json);
+            APP.lobby = json;
+            appHeader.classList.add("hide");
+            appFrame.src = APP.host + "/app-content/lobby";
+        } else alert("An error occured while requesting access to the lobby!");
     });
 
     const themeLinkerElem = document.head.querySelector(".app-theme-linker");
     const brightToggleElem = document.body.querySelector("#app-bright-mode");
     brightToggleElem.addEventListener("click", (ev) => {
+        
         ev.target.classList.toggle("app-bright-mode");
         localStorage.setItem("app-bright-mode", ev.target.classList.contains("app-bright-mode"));
+        
         if(ev.target.classList.contains("app-bright-mode")) 
             themeLinkerElem.href = "../app-content/css/theme/bright-theme.css";
-        else 
-            themeLinkerElem.removeAttribute("href");
+        else themeLinkerElem.href = "";
+
+        if(appFrame.src) {
+            appFrame.contentDocument.head.querySelector(".theme-linker").href 
+            = themeLinkerElem.href.replace("../app-content/");
+        }
+
     });
     if(localStorage.getItem("app-bright-mode") == "true")
     brightToggleElem.click();
+
+    function serializeVarContent(content) {
+        const varTokens = content.split("%");
+        var varContent = "";
+        for(var i = 0; i < varTokens.length; i++)
+        if(i % 2 == 1 && i + 1 < varTokens.length) {
+            const varPath = varTokens[i].split(".");
+            var varHead = APP;
+            varPath.forEach(path => varHead = varHead[path]);
+            varContent += JSON.stringify(varHead);
+        } else varContent += varTokens[i];
+        return varContent;
+    }
+
+    function recursiveTextElements(element, caller) {
+        for(var i = 0; i < element.childNodes.length; i++) {
+            if(element.childNodes[i].nodeType == Node.TEXT_NODE)
+            caller(element.childNodes[i]);   
+            recursiveTextElements(element.childNodes[i], caller);
+        }
+    }
+
+    appFrame.addEventListener("load", async () => {
+
+        appFrame.contentDocument.head.querySelector(".theme-linker").href 
+        = themeLinkerElem.href.replace("../app-content/");
+
+        appFrame.contentDocument.body.querySelectorAll("*").forEach((element) => {
+
+            recursiveTextElements(element, (textNode) => {
+                if(textNode.textContent.indexOf("%") != textNode.textContent.lastIndexOf("%")) 
+                textNode.textContent = serializeVarContent(textNode.textContent);
+            });
+
+            element.classList.forEach((className) => {
+                if(className.indexOf("%") != className.lastIndexOf("%"))
+                element.classList.remove(className);
+                element.classList.add(serializeVarContent(className));
+            });
+
+        });
+
+    });
 
 });

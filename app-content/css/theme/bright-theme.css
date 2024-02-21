@@ -4,9 +4,12 @@
 */
 :root {
 
-  --theme-color: #69F !important;
-  --theme-shadow-color: #46A !important;
+  --theme-color: #6FB;
+  --theme-shadow-color: #4A8;
 
-  --fill-color: #BAC !important;
+  --accent-color: #C93;
+  --accent-shadow-color: #963;
+
+  --fill-color: #CBD;
 
 }

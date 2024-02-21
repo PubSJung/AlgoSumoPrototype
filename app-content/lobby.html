@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="css/master.css" />
+  <link rel="stylesheet" href="css/lobby.css" />
+  <link rel="stylesheet" class="theme-linker" href="">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
+
+  <title> Lobby </title>
+
+</head>
+<body>
+
+  <div class="lobby-display">
+    <h1> Lobby: </h1>
+    <p id="lobby-name"> Game: %lobby.name% </p>
+    <p id="lobby-playername"> You: %username% </p>
+    <ol class="lobby-playerlist">
+    </ol>
+  </div>
+
+  <div class="class-display">
+
+    <h1> Sourcetree: </h1>
+
+    <div class="class-tree">
+      <p class="class-local-player"> LocalPlayer.js </p>
+      <h3> Dependencies: </p>
+      <div class="class-lobby-dep-mut"> 
+        <button class="class-lobby-dep-add"> add </button>
+        <button class="class-lobby-dep-del"> del </button>
+      </div>
+      <ul class="class-lobby-dependencies">
+      </ul>
+    </div>
+
+    <div class="class-editor">
+      <div id="class-editor" style="width: 100%; height: 100%;">
+      </div>
+    </div>
+
+  </div>
+
+<script>
+
+  const aceEditor = ace.edit("class-editor", {
+    mode: "ace/mode/javascript",
+    selectionStyle: "text"
+  });
+
+  window.addEventListener("resize", () => aceEditor.resize());
+
+  aceEditor.setTheme("ace/theme/monokai");
+
+  aceEditor.setValue(`
+  // NetPlayer-Controller
+  class LocalPlayer extends NetPlayer {
+
+  onCreate() {
+
+  }
+
+  onUpdate() {
+
+  }
+
+  onRender() {
+
+  }
+
+}`)
+
+</script>
+
+</body>
+</html>
