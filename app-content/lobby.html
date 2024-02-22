@@ -11,15 +11,23 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
 
+  <script src="lobby.js"> </script>
+
   <title> Lobby </title>
 
 </head>
 <body>
 
+  <script>
+    const UUID = "%uuid%";
+  </script>
+  
   <div class="lobby-display">
     <h1> Lobby: </h1>
-    <p id="lobby-name"> Game: %lobby.name% </p>
-    <p id="lobby-playername"> You: %username% </p>
+    <div class="lobby-details">
+      <p id="lobby-name"> Game: %lobby.name% </p>
+      <p id="lobby-playername"> You: %username% </p>
+    </div>
     <ol class="lobby-playerlist">
     </ol>
   </div>
@@ -29,13 +37,15 @@
     <h1> Sourcetree: </h1>
 
     <div class="class-tree">
-      <p class="class-local-player"> LocalPlayer.js </p>
+      <p class="class-local-player selected"> LocalPlayer.js </p>
+      <p class="style-local-player"> LocalPlayer.css </p>
       <h3> Dependencies: </p>
       <div class="class-lobby-dep-mut"> 
         <button class="class-lobby-dep-add"> add </button>
         <button class="class-lobby-dep-del"> del </button>
       </div>
       <ul class="class-lobby-dependencies">
+        %lobbyDepItems%
       </ul>
     </div>
 
@@ -49,7 +59,7 @@
 <script>
 
   const aceEditor = ace.edit("class-editor", {
-    mode: "ace/mode/javascript",
+    // mode: "ace/mode/javascript", --> formatting error :C
     selectionStyle: "text"
   });
 
@@ -66,10 +76,6 @@
   }
 
   onUpdate() {
-
-  }
-
-  onRender() {
 
   }
 

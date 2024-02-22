@@ -20,6 +20,7 @@ var appEndpointObj = undefined;
 const APP = {
     host: localStorage.getItem("app-host"),
     latestAuthEncrypt: 255,
+    lobbyDepItems: "",
     lobby: localStorage.getItem("app-lobby") || {
         ulid: "99999999"
     },
@@ -250,7 +251,7 @@ window.addEventListener("load", () => {
             const varPath = varTokens[i].split(".");
             var varHead = APP;
             varPath.forEach(path => varHead = varHead[path]);
-            varContent += JSON.stringify(varHead);
+            varContent += varHead;
         } else varContent += varTokens[i];
         return varContent;
     }
@@ -280,6 +281,26 @@ window.addEventListener("load", () => {
                 element.classList.remove(className);
                 element.classList.add(serializeVarContent(className));
             });
+
+        });
+
+        appFrame.contentDocument.body.querySelectorAll("script").forEach((scriptElem) => {
+            
+            if(scriptElem.src)
+            return;
+
+            var varScript = "";
+            const scriptLines = scriptElem.textContent.split("\n");
+            for(var i = 0; i < scriptLines.length; i++) {
+                var scriptLine = scriptLines[i].trim();
+                if(
+                    scriptLine.startsWith("const") 
+                    && scriptLine.indexOf("\"%") > 0
+                    && scriptLine.indexOf("%\"") > 0
+                ) scriptLine = serializeVarContent(scriptLine);
+                varScript += (scriptLine + '\n');
+            }
+            scriptElem.textContent = varScript;
 
         });
 

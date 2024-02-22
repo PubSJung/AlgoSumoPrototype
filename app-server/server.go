@@ -121,6 +121,10 @@ func (srv *ASServer) RegisterBackRoutes() {
 	srv.HandlePacketFunc("/user/auth", srv.UserList.AuthRouteHandler()).Methods("POST")
 
 	srv.HandlePacketFunc("/lobby/request", srv.LobbyList.RequestRouteHandler()).Methods("POST")
+	srv.HandlePacketFunc("/lobby/dep/add", nil).Methods("POST")
+	srv.HandlePacketFunc("/lobby/dep/del", nil).Methods("DELETE")
+	srv.HandlePacketFunc("/lobby/player/class", nil).Methods("POST")
+	srv.HandlePacketFunc("/lobby/player/style", nil).Methods("POST")
 
 }
 

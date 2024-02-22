@@ -16,12 +16,12 @@ while [ true ]; do
     echo "Platform (windows/linux):"
     read -p " > " as_platform
 
-    env GOOS=$as_platform GOARCH=$as_arch go build -o deploy-srv
+    cmd "/C env GOOS=$as_platform GOARCH=$as_arch go build -o deploy-srv"
 
   elif [ "$as_build_mode" == "debug" ]; then
 
     echo "Building Debug-Server..."
-    go build -o debug-srv
+    cmd "/C go build -o debug-srv"
 
     echo "Launching Debug-Server..."
     ./debug-srv

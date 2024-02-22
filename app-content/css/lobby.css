@@ -69,6 +69,17 @@
   font-family: monospace;
 } 
 
+.class-display .selected {
+  color: var(--accent-color);
+  text-shadow: 0 0 0.5em var(--accent-shadow-color);
+}
+
+.class-display .class-local-player,
+.class-display .style-local-player,
+.class-display .class-lobby-dependencies * {
+  cursor: pointer;
+}
+
 .class-display .class-tree * {
   margin-top: 0.25em;
   margin-bottom: 0.5em;
@@ -91,4 +102,21 @@
 .class-lobby-dep-mut {
   transform: translateY(-50%);
   display: inline-flex;
+}
+
+.lobby-details {
+  margin-top: 1em;
+  position: relative;
+  background-color: #0002;
+  border: #0008 thin solid;
+  text-indent: 1em;
+}
+
+.lobby-playerlist {
+  position: relative;
+  left: 0;
+  width: calc(100% - 2.5em);
+  height: calc(100% - 10.75em);
+  background-color: #0002;
+  border: #0008 thin solid;
 }

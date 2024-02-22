@@ -11,9 +11,9 @@ import (
 type ASLobby struct {
 	Players           []ASPlayer        `json:"players"`
 	Name              string            `json:"name"`
-	Password          string            `json:"password"`
 	DependencyClasses map[string]string `json:"dependency_classes"`
 	ULID              string            `json:"ulid"`
+	Password          string            `json:"-"`
 }
 
 type ASLobbyList struct {
@@ -28,20 +28,25 @@ func NewLobbyList() *ASLobbyList {
 	}
 }
 
-func (l *ASLobbyList) AddLobby(name string, password string) string {
-
-	count_str := strconv.Itoa(l.Count)
+func FormatULID(index int) string {
+	count_str := strconv.Itoa(index)
 	ulid := ""
 	for i := 0; i < 8-len(count_str); i++ {
 		ulid += "0"
 	}
 	ulid += count_str
+	return ulid
+}
 
+func (l *ASLobbyList) AddLobby(name string, password string) string {
+
+	ulid := FormatULID(l.Count)
 	l.Lobbies = append(l.Lobbies, &ASLobby{
-		Players:  make([]ASPlayer, 0),
-		Name:     name,
-		Password: password,
-		ULID:     ulid,
+		Players:           make([]ASPlayer, 0),
+		Name:              name,
+		Password:          password,
+		ULID:              ulid,
+		DependencyClasses: make(map[string]string),
 	})
 	l.Count++
 
@@ -68,6 +73,18 @@ func (l *ASLobbyList) GetLobbyIndex(ulid string) int {
 func (l *ASLobbyList) DisposeLobby(ulid string) {
 	index := l.GetLobbyIndex(ulid)
 	l.Lobbies[index] = nil
+}
+
+func (l *ASLobbyList) AddPlayer(ulid string, uuid string, name string, admin bool) {
+	index := l.GetLobbyIndex(ulid)
+	l.Lobbies[index].Players = append(l.Lobbies[index].Players, ASPlayer{
+		Admin:                 admin,
+		Name:                  name,
+		UUID:                  uuid,
+		ULID:                  ulid,
+		LocalPlayerJSClass:    "",
+		LocalPlayerStylesheet: "",
+	})
 }
 
 type RequestPacketIn struct {
@@ -101,6 +118,7 @@ func (l *ASLobbyList) RequestRouteHandler() func(http.ResponseWriter, *http.Requ
 			return
 		}
 
+		admin_added := false
 		index := l.GetLobbyIndex(in_packet.ULID)
 		if index < 0 {
 			lobby_found := false
@@ -118,7 +136,13 @@ func (l *ASLobbyList) RequestRouteHandler() func(http.ResponseWriter, *http.Requ
 			if !lobby_found {
 				l.AddLobby(in_packet.Lobbyname, in_packet.Password)
 				index = l.Count - 1
+				l.AddPlayer(FormatULID(index), in_packet.UUID, in_packet.Username, true)
+				admin_added = true
 			}
+		}
+
+		if !admin_added {
+			l.AddPlayer(FormatULID(index), in_packet.UUID, in_packet.Username, false)
 		}
 
 		json_lobby, err := json.Marshal(l.Lobbies[index])
@@ -132,4 +156,16 @@ func (l *ASLobbyList) RequestRouteHandler() func(http.ResponseWriter, *http.Requ
 		w.Write(json_lobby)
 
 	}
+}
+
+// TODO
+type DepAddPacketIn struct {
+}
+
+func (l *ASLobbyList) DepAddRouteHandler() func(http.ResponseWriter, *http.Request) {
+	return nil // TODO
+}
+
+func (l *ASLobbyList) DepDelRouteHandler() func(http.ResponseWriter, *http.Request) {
+	return nil // TODO
 }
