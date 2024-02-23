@@ -157,7 +157,7 @@ body *:first-child {
 
 .app-bright-theme-toggle {
     background-color: #AA44;
-    background-image: url("../app-content/img/bright_mode_sun.png");
+    background-image: url("app-theme-toggle.png");
     background-repeat: no-repeat;
     background-size: cover;
     position: fixed;

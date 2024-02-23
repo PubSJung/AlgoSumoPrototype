@@ -21,6 +21,7 @@ type ASServer struct {
 
 func NewServer(cfg ASConfig) *ASServer {
 
+	// checks if a directory named "tls" exists for HTTPS
 	tls := false
 	if io, err := os.Stat("tls"); err == nil && io.IsDir() {
 		tls = true
@@ -34,9 +35,10 @@ func NewServer(cfg ASConfig) *ASServer {
 	}
 
 	srv.UserList = *LoadUserList(srv)
+	srv.LobbyList = *CreateLobbyList(srv)
 
-	srv.RegisterBackRoutes()
-	srv.RegisterAppFrontend()
+	srv.RegisterAppPackets()
+	srv.RegisterAppInterface()
 
 	return srv
 
@@ -69,10 +71,11 @@ func (srv *ASServer) HandleFileQuery(route string, path string) {
 		w.Header().Add("Content-Type", mime_type)
 		w.Write(data)
 	}).Methods("GET")
-	fmt.Println("Registered route: \"" + route + "\", for path: \"" + path + "\" (\"" + mime_type + "\").")
+	fmt.Println("Registered file-route: \"" + route + "\", for path: \"" + path + "\" (\"" + mime_type + "\").")
 }
 
 func (srv *ASServer) HandlePacketFunc(route string, handler func(w http.ResponseWriter, r *http.Request)) *mux.Route {
+	fmt.Println("Registered packet-route: \"/app-packets" + route + "\".")
 	return srv.HandleFunc("/app-packets"+route, handler)
 }
 
@@ -115,23 +118,34 @@ func (srv *ASServer) Run() {
 	}
 }
 
-func (srv *ASServer) RegisterBackRoutes() {
+func (srv *ASServer) RegisterAppPackets() {
 
+	// USER-PACKETS:
 	srv.HandlePacketFunc("/user/push", srv.UserList.PushRouteHandler()).Methods("POST")
 	srv.HandlePacketFunc("/user/auth", srv.UserList.AuthRouteHandler()).Methods("POST")
 
+	// LOBBY-PACKETS:
 	srv.HandlePacketFunc("/lobby/request", srv.LobbyList.RequestRouteHandler()).Methods("POST")
-	srv.HandlePacketFunc("/lobby/dep/add", nil).Methods("POST")
-	srv.HandlePacketFunc("/lobby/dep/del", nil).Methods("DELETE")
-	srv.HandlePacketFunc("/lobby/player/class", nil).Methods("POST")
-	srv.HandlePacketFunc("/lobby/player/style", nil).Methods("POST")
+	srv.HandlePacketFunc("/lobby/entity/add", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("POST")
+	srv.HandlePacketFunc("/lobby/entity/del", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("DELETE")
+	srv.HandlePacketFunc("/lobby/entity/src", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("POST")
+	srv.HandlePacketFunc("/lobby/entity/obj", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("POST")
+
+	// GAME-PACKETS:
+	srv.HandlePacketFunc("/game/request", nil).Methods("GET")
+	srv.HandlePacketFunc("/game/obj", nil).Methods("POST")
+	srv.HandlePacketFunc("/game/src", nil).Methods("POST")
 
 }
 
-func (srv *ASServer) RegisterAppFrontend() {
+func (srv *ASServer) RegisterAppInterface() {
 
-	filepath.Walk("app-frame/", srv.FrontendWalker())
+	// CONTENT-HOST:
 	filepath.Walk("app-content/", srv.FrontendWalker())
+
+	// FRAME-HOST:
+	filepath.Walk("app-frame/", srv.FrontendWalker())
+	srv.HandleFileQuery("/favicon.ico", "favicon.ico")
 	srv.HandleFileQuery("/", "index.html")
 
 }

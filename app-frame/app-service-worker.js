@@ -4,8 +4,6 @@ self.addEventListener("install", (ev) => {
         (cache) => {
             return cache.addAll([
 
-                "/app-content/favicon.png",
-                "/app-content/favicon.ico",
                 "/app-content/css/fonts/Nunito.ttf",
                 "/app-content/css/fonts/Teko.ttf",
                 "/app-content/css/theme/defaults/colors.css",
@@ -13,9 +11,11 @@ self.addEventListener("install", (ev) => {
                 "/app-content/css/theme/bright-theme.css",
                 "/app-content/css/master.css",
 
+                "/app-frame/app-logo.png",
                 "/app-frame/app-frame.css",
                 "/app-frame/app-frame.js",
 
+                "/favicon.ico",
                 "/"
 
             ]);

@@ -13,6 +13,11 @@
     src: url("../../fonts/Teko.ttf");
 }
 
+@font-face {
+    font-family: FiraCode;
+    src: url("../../fonts/FiraCode.ttf");
+}
+
 
 /*
     Theme-Variables
@@ -21,4 +26,5 @@
 :root {
     --theme-font: Teko, sans-serif;
     --default-font: Nunito, sans-serif;
+    --code-font: FiraCode, sans-serif;
 }

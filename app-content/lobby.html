@@ -9,18 +9,21 @@
   <link rel="stylesheet" href="css/lobby.css" />
   <link rel="stylesheet" class="theme-linker" href="">
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" charset="utf-8">  </script>
 
-  <script src="lobby.js"> </script>
+  <script>
+    //Frame-Bindings: 
+    //bind UUID = %uuid%
+    //bind LOBBY = %lobby%
+  </script>
+
+  <script type="text/javascript" src="source/net-player.js"> </script>
+  <script type="text/javascript" src="source/lobby.js"> </script>
 
   <title> Lobby </title>
 
 </head>
 <body>
-
-  <script>
-    const UUID = "%uuid%";
-  </script>
   
   <div class="lobby-display">
     <h1> Lobby: </h1>
@@ -30,6 +33,7 @@
     </div>
     <ol class="lobby-playerlist">
     </ol>
+    <button type="button" class="lobby-launch"> Launch Game. </button>
   </div>
 
   <div class="class-display">
@@ -39,13 +43,12 @@
     <div class="class-tree">
       <p class="class-local-player selected"> LocalPlayer.js </p>
       <p class="style-local-player"> LocalPlayer.css </p>
-      <h3> Dependencies: </p>
-      <div class="class-lobby-dep-mut"> 
-        <button class="class-lobby-dep-add"> add </button>
-        <button class="class-lobby-dep-del"> del </button>
+      <h3> GlobalEntities: </p>
+      <div class="class-lobby-entity-mut"> 
+        <button class="class-lobby-entity-add"> add </button>
+        <button class="class-lobby-entity-del"> del </button>
       </div>
-      <ul class="class-lobby-dependencies">
-        %lobbyDepItems%
+      <ul class="class-lobby-entities">
       </ul>
     </div>
 
@@ -59,13 +62,17 @@
 <script>
 
   const aceEditor = ace.edit("class-editor", {
-    // mode: "ace/mode/javascript", --> formatting error :C
+    mode: "ace/mode/javascript", //--> formatting error :C
     selectionStyle: "text"
   });
 
   window.addEventListener("resize", () => aceEditor.resize());
 
   aceEditor.setTheme("ace/theme/monokai");
+  aceEditor.setOptions({
+    fontFamily: "FiraCode",
+    fontSize: "14pt"
+  });
 
   aceEditor.setValue(`
   // NetPlayer-Controller

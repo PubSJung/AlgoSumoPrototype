@@ -2,10 +2,9 @@
 @import url("theme/defaults/colors.css");
 @import url("theme/defaults/fonts.css");
 
-* {
-    
-    font-family: var(--default-font);
+*:not(.ace_editor, .ace_editor *, h1, h2, h3) {
 
+    font-family: var(--default-font);
     color: var(--theme-color);
     border-color: var(--shadow-color);
     border-radius: 0.25em;

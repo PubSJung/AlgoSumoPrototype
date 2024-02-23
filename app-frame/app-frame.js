@@ -3,26 +3,33 @@ const DEFAULT_HOST = "";
 const FALLBACK_HOST = "";
 const LOCAL_HOST = "http://localhost"
 
-const PASSKEY_LENGTH = 16;
-function generatePassKey() {
+const USER_PASSKEY_LENGTH = 16;
+function genUserPassKey() {
 
     var passkey = "";
-    for(var i = 0; i < PASSKEY_LENGTH; i++)
+    for(var i = 0; i < USER_PASSKEY_LENGTH; i++)
     passkey += String(Math.floor(Math.random() * 10));
 
     return passkey;
 
 }
 
-var appFrame = undefined;
+var appContentFrame = undefined;
 var appEndpointObj = undefined;
 
-const APP = {
+const APP_VARS = {
     host: localStorage.getItem("app-host"),
     latestAuthEncrypt: 255,
-    lobbyDepItems: "",
     lobby: localStorage.getItem("app-lobby") || {
         ulid: "99999999"
+    },
+    _session: localStorage.getItem("app-session"),
+    get session() {
+        return this._session;
+    },
+    set session(value) {
+        this._session = value;
+        localStorage.setItem("app-session", value);
     },
     _username: localStorage.getItem("username"),
     get username() {
@@ -40,7 +47,7 @@ const APP = {
         this._uuid = value;
         localStorage.setItem("uuid", value);
     },
-    passkey: localStorage.getItem("passkey") || generatePassKey(),
+    passkey: localStorage.getItem("passkey") || genUserPassKey(),
     get authkey() {
 
         this.latestAuthEncrypt--;
@@ -57,7 +64,7 @@ const APP = {
 // assure the host is actually a legit game-server instance
 async function validateAppEndpoint() {
 
-    const response = await fetch(APP.host + "/app-content/endpoint.json", {
+    const response = await fetch(APP_VARS.host + "/app-content/endpoint.json", {
         "method": "GET"
     });
     if(response.status < 200 || response.status > 299)
@@ -71,60 +78,68 @@ async function validateAppEndpoint() {
 
 }
 
+// select the host of this application and load the content of this host into the app-content-frame
 async function selectAppHost(host) {
 
-    APP.host = host;
+    APP_VARS.host = host;
     const valid = await validateAppEndpoint();
 
-    if(appFrame && valid) {
+    if(appContentFrame && valid) {
 
-        if(!appFrame.classList.contains("app-host-loaded"))
-        appFrame.classList.add("app-host-loaded");
+        if(!appContentFrame.classList.contains("app-host-loaded"))
+        appContentFrame.classList.add("app-host-loaded");
 
-        if(APP.uuid)  {
-            fetch(APP.host + "/app-packets/user/auth", {
+        if(APP_VARS.uuid)  {
+            // Authenticate saved user
+            fetch(APP_VARS.host + "/app-packets/user/auth", {
                 "method": "POST",
                 "headers": {
                     "Content-Type": "application/json"
                 },
                 "body": JSON.stringify({
-                    "authkey": APP.authkey,
-                    "uuid": APP.uuid
+                    "authkey": APP_VARS.authkey,
+                    "uuid": APP_VARS.uuid
                 })
             })
                 .then((data) => {
+                    // when failed -> remove saved user -> reload -> push new
                     if(data.status != 200) {
                         localStorage.removeItem("uuid");
-                        window.open(document.URL, "_self");
+                        document.location.reload();
                     }
                 })
         } else {
-            fetch(APP.host + "/app-packets/user/push", {
+            // Push new user
+            fetch(APP_VARS.host + "/app-packets/user/push", {
                 "method": "POST",
                 "headers": {
                     "Content-Type": "text/plain"
                 },
-                "body": APP.passkey
+                "body": APP_VARS.passkey
             })
                 .then((data) => data.text())
                 .then((text) => {
-                    APP.uuid = text;
-                    localStorage.setItem("passkey", APP.passkey);
+                    APP_VARS.uuid = text;
+                    localStorage.setItem("passkey", APP_VARS.passkey);
+                    localStorage.removeItem("auth-byte");
                 });
         } 
 
-    } else if(appFrame.classList.contains("app-host-loaded")) 
-    appFrame.classList.remove("app-host-loaded");
+    } else if(appContentFrame.classList.contains("app-host-loaded")) 
+    appContentFrame.classList.remove("app-host-loaded");
 
 }
 
+// HTML-Window-Resize-Listener
 window.addEventListener("resize", () => {
     if(window.innerHeight > window.innerWidth) 
-    alert("Please keep this application in portrait-mode!");
+    alert("Please keep this application in portrait-mode, it is meant to be used on a Desktop-PC.");
 });
 
+// HTML-Window-Load-Listener
 window.addEventListener("load", () => {
     
+    // HTTP-Get latest endpoint of this frame
     fetch("app-content/endpoint.json", {
         "method": "GET"
     })
@@ -133,11 +148,12 @@ window.addEventListener("load", () => {
             appEndpointObj = json;
         });
 
-    appFrame = document.body.querySelector("iframe.app-content");
+    appContentFrame = document.body.querySelector("iframe.app-content");
 
     const hostSelectElem = document.body.querySelector("#app-host-select");
     const hostInputElem = document.body.querySelector("#app-host-custom");
 
+    // Host-Selection-Changed-Listener
     hostSelectElem.addEventListener("change", (ev) => {
                 
         if(!hostInputElem.classList.contains("hide"))
@@ -168,6 +184,7 @@ window.addEventListener("load", () => {
     hostSelectElem.value = localStorage.getItem("app-host") || "default";
     hostSelectElem.dispatchEvent(new Event("change"));
 
+    // Custom-Host-Changed-Listener
     hostInputElem.addEventListener(
         "change", 
         (ev) => selectAppHost(ev.target.value)
@@ -177,6 +194,7 @@ window.addEventListener("load", () => {
     const lobbyDefElem = document.body.querySelector("#app-lobby");
     const reqAccessElem = document.body.querySelector("#app-request-access");
 
+    // Username-Changed-Listener
     userInputElem.addEventListener("change", (ev) => {
 
         if(!lobbyDefElem.classList.contains("hide"))
@@ -184,42 +202,44 @@ window.addEventListener("load", () => {
         if(!reqAccessElem.classList.contains("hide"))
         reqAccessElem.classList.add("hide");
 
-        APP.username = ev.target.value;
+        APP_VARS.username = ev.target.value;
 
-        if(APP.username.length > 4 && APP.username.length <= 16) {
+        if(APP_VARS.username.length > 4 && APP_VARS.username.length <= 16) {
             lobbyDefElem.classList.remove("hide");
             reqAccessElem.classList.remove("hide");
-            lobbyDefElem.querySelector("#app-lobby-name").value = APP.username + "s Lobby";
+            lobbyDefElem.querySelector("#app-lobby-name").value = APP_VARS.username + "s Lobby";
         }
 
     });
-    userInputElem.value = APP.username;
+    userInputElem.value = APP_VARS.username;
     userInputElem.dispatchEvent(new Event("change"));
     
     const appHeader = document.body.querySelector(".app-header");
 
     reqAccessElem.addEventListener("click", async () => {
-        const response = await fetch(APP.host + "/app-packets/lobby/request", {
+        const response = await fetch(APP_VARS.host + "/app-packets/lobby/request", {
             "method": "POST",
             "headers": {
                 "Content-Type": "application/json"
             },
             "body": JSON.stringify({
-                "username": APP.username,
-                "uuid": APP.uuid,
-                "authkey": APP.authkey,
-                "ulid": APP.lobby.ulid,
+                "username": APP_VARS.username,
+                "uuid": APP_VARS.uuid,
+                "authkey": APP_VARS.authkey,
+                "ulid": APP_VARS.lobby.ulid,
                 "lobbyname": lobbyDefElem.querySelector("#app-lobby-name").value,
                 "password": lobbyDefElem.querySelector("#app-lobby-password").value
             })
         });
         if(response.status == 200) {
+
             const json = await response.json();
             console.log(json);
-            localStorage.setItem("app-lobby", json);
-            APP.lobby = json;
+            localStorage.setItem("app-lobby", json.lobby);
+            APP_VARS.lobby = json.lobby;
             appHeader.classList.add("hide");
-            appFrame.src = APP.host + "/app-content/lobby";
+            appContentFrame.src = APP_VARS.host + "/app-content/lobby";
+
         } else alert("An error occured while requesting access to the lobby!");
     });
 
@@ -234,8 +254,8 @@ window.addEventListener("load", () => {
             themeLinkerElem.href = "../app-content/css/theme/bright-theme.css";
         else themeLinkerElem.href = "";
 
-        if(appFrame.src) {
-            appFrame.contentDocument.head.querySelector(".theme-linker").href 
+        if(appContentFrame.src) {
+            appContentFrame.contentDocument.head.querySelector(".theme-linker").href 
             = themeLinkerElem.href.replace("../app-content/");
         }
 
@@ -249,9 +269,9 @@ window.addEventListener("load", () => {
         for(var i = 0; i < varTokens.length; i++)
         if(i % 2 == 1 && i + 1 < varTokens.length) {
             const varPath = varTokens[i].split(".");
-            var varHead = APP;
+            var varHead = APP_VARS;
             varPath.forEach(path => varHead = varHead[path]);
-            varContent += varHead;
+            varContent += JSON.stringify(varHead);
         } else varContent += varTokens[i];
         return varContent;
     }
@@ -264,12 +284,12 @@ window.addEventListener("load", () => {
         }
     }
 
-    appFrame.addEventListener("load", async () => {
+    appContentFrame.addEventListener("load", async () => {
 
-        appFrame.contentDocument.head.querySelector(".theme-linker").href 
+        appContentFrame.contentDocument.head.querySelector(".theme-linker").href 
         = themeLinkerElem.href.replace("../app-content/");
 
-        appFrame.contentDocument.body.querySelectorAll("*").forEach((element) => {
+        appContentFrame.contentDocument.body.querySelectorAll("*").forEach((element) => {
 
             recursiveTextElements(element, (textNode) => {
                 if(textNode.textContent.indexOf("%") != textNode.textContent.lastIndexOf("%")) 
@@ -284,7 +304,7 @@ window.addEventListener("load", () => {
 
         });
 
-        appFrame.contentDocument.body.querySelectorAll("script").forEach((scriptElem) => {
+        appContentFrame.contentDocument.head.querySelectorAll("script").forEach((scriptElem) => {
             
             if(scriptElem.src)
             return;
@@ -293,14 +313,18 @@ window.addEventListener("load", () => {
             const scriptLines = scriptElem.textContent.split("\n");
             for(var i = 0; i < scriptLines.length; i++) {
                 var scriptLine = scriptLines[i].trim();
-                if(
-                    scriptLine.startsWith("const") 
-                    && scriptLine.indexOf("\"%") > 0
-                    && scriptLine.indexOf("%\"") > 0
-                ) scriptLine = serializeVarContent(scriptLine);
-                varScript += (scriptLine + '\n');
+                if(scriptLine.startsWith("//bind ")) {
+                    scriptLine = scriptLine.substring(7);
+                    const varPrefix = (scriptLine[0] == scriptLine[0].toUpperCase() ? "const " : "var ");
+                    scriptLine = (varPrefix + serializeVarContent(scriptLine) + ";\n");
+                } 
+                varScript += scriptLine;
             }
-            scriptElem.textContent = varScript;
+
+            const newScript = document.createElement("script");
+            newScript.textContent = varScript;
+            appContentFrame.contentDocument.head.insertBefore(newScript, scriptElem);
+            appContentFrame.contentDocument.head.removeChild(scriptElem);
 
         });
 

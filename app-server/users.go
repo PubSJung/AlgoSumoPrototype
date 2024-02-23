@@ -66,6 +66,18 @@ func (ul *ASUserList) Authorize(uuid string, authkey string) bool {
 	}
 }
 
+func (ul *ASUserList) CreatePlayerSession(uuid string, authkey string) string {
+	if user, ok := ul.Users[uuid]; ok {
+		session := user.GenerateAuthKey()
+		if session == authkey {
+			return session
+		} else {
+			fmt.Println("Wrong Session Auth.: \"" + session + "\" == \"" + authkey + "\"")
+		}
+	}
+	return ""
+}
+
 func (ul *ASUserList) Push(passkey string) string {
 	uuid := ul.Config.GenerateUUID(ul.Count)
 	ul.Users[uuid] = ASUser{
@@ -78,7 +90,7 @@ func (ul *ASUserList) Push(passkey string) string {
 	return uuid
 }
 
-type LoginPacketIn struct {
+type AuthPacketIn struct {
 	Authkey string `json:"authkey"`
 	UUID    string `json:"uuid"`
 }
@@ -92,7 +104,7 @@ func (ul *ASUserList) AuthRouteHandler() func(http.ResponseWriter, *http.Request
 			w.WriteHeader(400)
 			return
 		}
-		in_packet := &LoginPacketIn{
+		in_packet := &AuthPacketIn{
 			Authkey: "",
 			UUID:    "",
 		}
