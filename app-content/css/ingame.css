@@ -1,0 +1,5 @@
+
+body div {
+  background-color: var(--theme-color);
+  border-radius: 2.5vh;
+}

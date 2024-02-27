@@ -14,10 +14,11 @@
   <script>
     //Frame-Bindings: 
     //bind UUID = %uuid%
+    //bind SESSION = %session%
+    //bind PLAYER_INDEX = %playerIndex%
     //bind LOBBY = %lobby%
   </script>
 
-  <script type="text/javascript" src="source/net-player.js"> </script>
   <script type="text/javascript" src="source/lobby.js"> </script>
 
   <title> Lobby </title>
@@ -29,11 +30,11 @@
     <h1> Lobby: </h1>
     <div class="lobby-details">
       <p id="lobby-name"> Game: %lobby.name% </p>
-      <p id="lobby-playername"> You: %username% </p>
+      <p id="lobby-playername"> Player-%playerIndex%: %username% </p>
     </div>
     <ol class="lobby-playerlist">
     </ol>
-    <button type="button" class="lobby-launch"> Launch Game. </button>
+    <button type="button" class="lobby-launch p%playerIndex%"> Launch Game. </button>
   </div>
 
   <div class="class-display">
@@ -41,10 +42,10 @@
     <h1> Sourcetree: </h1>
 
     <div class="class-tree">
-      <p class="class-local-player selected"> LocalPlayer.js </p>
+      <p class="class-local-player"> LocalPlayer.js </p>
       <p class="style-local-player"> LocalPlayer.css </p>
-      <h3> GlobalEntities: </p>
-      <div class="class-lobby-entity-mut"> 
+      <h3> GlobalEntities: </h3>
+      <div class="class-lobby-entity-mut p%playerIndex%"> 
         <button class="class-lobby-entity-add"> add </button>
         <button class="class-lobby-entity-del"> del </button>
       </div>
@@ -62,7 +63,6 @@
 <script>
 
   const aceEditor = ace.edit("class-editor", {
-    mode: "ace/mode/javascript", //--> formatting error :C
     selectionStyle: "text"
   });
 
@@ -73,20 +73,6 @@
     fontFamily: "FiraCode",
     fontSize: "14pt"
   });
-
-  aceEditor.setValue(`
-  // NetPlayer-Controller
-  class LocalPlayer extends NetPlayer {
-
-  onCreate() {
-
-  }
-
-  onUpdate() {
-
-  }
-
-}`)
 
 </script>
 

@@ -23,13 +23,21 @@ const APP_VARS = {
     lobby: localStorage.getItem("app-lobby") || {
         ulid: "99999999"
     },
-    _session: localStorage.getItem("app-session"),
+    _playerIndex: localStorage.getItem("player-index"),
+    get playerIndex() {
+        return this._playerIndex;
+    },
+    set playerIndex(value) {
+        this._playerIndex = value;
+        localStorage.setItem("player-index", value);
+    },
+    _session: localStorage.getItem("session"),
     get session() {
         return this._session;
     },
     set session(value) {
         this._session = value;
-        localStorage.setItem("app-session", value);
+        localStorage.setItem("session", value);
     },
     _username: localStorage.getItem("username"),
     get username() {
@@ -50,9 +58,9 @@ const APP_VARS = {
     passkey: localStorage.getItem("passkey") || genUserPassKey(),
     get authkey() {
 
-        this.latestAuthEncrypt--;
         if(this.latestAuthEncrypt <= 0)
         this.latestAuthEncrypt = 255;
+        this.latestAuthEncrypt--;
 
         var sha = sha256.create();
         sha.update(this.passkey + String(this.latestAuthEncrypt));
@@ -121,7 +129,6 @@ async function selectAppHost(host) {
                 .then((text) => {
                     APP_VARS.uuid = text;
                     localStorage.setItem("passkey", APP_VARS.passkey);
-                    localStorage.removeItem("auth-byte");
                 });
         } 
 
@@ -232,14 +239,14 @@ window.addEventListener("load", () => {
             })
         });
         if(response.status == 200) {
-
             const json = await response.json();
             console.log(json);
             localStorage.setItem("app-lobby", json.lobby);
             APP_VARS.lobby = json.lobby;
+            APP_VARS.session = json.session;
+            APP_VARS.playerIndex = json.player_index;
             appHeader.classList.add("hide");
             appContentFrame.src = APP_VARS.host + "/app-content/lobby";
-
         } else alert("An error occured while requesting access to the lobby!");
     });
 
@@ -318,7 +325,7 @@ window.addEventListener("load", () => {
                     const varPrefix = (scriptLine[0] == scriptLine[0].toUpperCase() ? "const " : "var ");
                     scriptLine = (varPrefix + serializeVarContent(scriptLine) + ";\n");
                 } 
-                varScript += scriptLine;
+                varScript += (scriptLine + '\n');
             }
 
             const newScript = document.createElement("script");

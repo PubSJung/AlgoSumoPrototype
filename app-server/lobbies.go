@@ -105,12 +105,10 @@ func (l *ASLobbyList) AddPlayer(ulid string, uuid string, name string, session s
 			PosX:        x,
 			PosY:        y,
 			Scale:       s,
-			VelX:        0,
-			VelY:        0,
 			VelModifier: 0,
 		},
 		NetSource: ASNetSource{
-			ClientClass:      "class LocalPlayer extends NetPlayer {\n\n\tconstructor() {\n/* Your Players code...*/ \n}\n\n}",
+			ClientClass:      "class LocalPlayer extends NetPlayer {\n\n\tconstructor(playerIndex, domElement) {\n\t\tsuper(playerIndex, domElement);\n\t\t/* Your Players code...*/ \n\t}\n\n}",
 			ClientStylesheet: ".local-player {\n\t/* Your Player style... */\n}",
 		},
 	})
@@ -155,12 +153,13 @@ func (l *ASLobbyList) RequestRouteHandler() func(http.ResponseWriter, *http.Requ
 			return
 		}
 
-		session := l.Server.UserList.CreatePlayerSession(in_packet.UUID, in_packet.Authkey)
-		if session == "" {
+		if !l.Server.UserList.Authenticate(in_packet.UUID, in_packet.Authkey) {
 			fmt.Println("ERROR: Wrong authkey.")
 			w.WriteHeader(400)
 			return
 		}
+
+		session := in_packet.Authkey
 
 		admin_added := false
 		index := l.GetLobbyIndex(in_packet.ULID)
@@ -185,13 +184,26 @@ func (l *ASLobbyList) RequestRouteHandler() func(http.ResponseWriter, *http.Requ
 			}
 		}
 
-		if !admin_added {
+		user_index := -1
+		for pi, player := range l.Lobbies[index].Players {
+			if player.UUID == in_packet.UUID {
+				if player.Session != session {
+					fmt.Println("ERROR: Wrong session.")
+					return
+				}
+				user_index = pi
+				break
+			}
+		}
+
+		if !admin_added && user_index < 0 {
 			l.AddPlayer(FormatULID(index), in_packet.UUID, in_packet.Username, session, false)
+			user_index = len(l.Lobbies[index].Players) - 1
 		}
 
 		out_packet := RequestPacketOut{
 			Lobby:       l.Lobbies[index],
-			PlayerIndex: len(l.Lobbies[index].Players) - 1,
+			PlayerIndex: user_index,
 			Session:     session,
 		}
 

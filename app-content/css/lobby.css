@@ -71,7 +71,7 @@
 
 .class-display .class-local-player,
 .class-display .style-local-player,
-.class-display .class-lobby-dependencies * {
+.class-display .class-lobby-entity-mut * {
   cursor: pointer;
 }
 
@@ -95,7 +95,11 @@
 }
 
 .class-lobby-entity-mut {
+  display: none;
   transform: translateY(-50%);
+}
+
+.class-lobby-entity-mut.p0 {
   display: inline-flex;
 }
 
@@ -111,7 +115,28 @@
   position: relative;
   left: 0;
   width: calc(100% - 2.5em);
-  height: calc(100% - 10.75em);
+  height: calc(100% - 14.75em);
   background-color: #0002;
   border: #0008 thin solid;
+}
+
+.lobby-launch {
+  background-color: #0006;
+  position: relative;
+  left: 0;
+  width: 100%;
+  height: 3em;
+  cursor: default;
+  border: #888 thin solid;
+  color: #888;
+}
+
+.lobby-launch.p0 {
+  border: var(--theme-color) thin solid;
+  color: var(--theme-color);
+  cursor: pointer;
+}
+
+.lobby-launch.p0:hover {
+  background-color: #0004;
 }

@@ -126,15 +126,8 @@ func (srv *ASServer) RegisterAppPackets() {
 
 	// LOBBY-PACKETS:
 	srv.HandlePacketFunc("/lobby/request", srv.LobbyList.RequestRouteHandler()).Methods("POST")
-	srv.HandlePacketFunc("/lobby/entity/add", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("POST")
-	srv.HandlePacketFunc("/lobby/entity/del", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("DELETE")
-	srv.HandlePacketFunc("/lobby/entity/src", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("POST")
-	srv.HandlePacketFunc("/lobby/entity/obj", nil /* (ADMIN-FUNCTIONALITY) ToDo */).Methods("POST")
-
-	// GAME-PACKETS:
-	srv.HandlePacketFunc("/game/request", nil).Methods("GET")
-	srv.HandlePacketFunc("/game/obj", nil).Methods("POST")
-	srv.HandlePacketFunc("/game/src", nil).Methods("POST")
+	srv.HandlePacketFunc("/lobby/player/source", srv.LobbyList.PlayerSourceRouteHandler()).Methods("POST")
+	srv.HandlePacketFunc("/lobby/player/list", srv.LobbyList.PlayerListRouteHandler()).Methods("POST")
 
 }
 

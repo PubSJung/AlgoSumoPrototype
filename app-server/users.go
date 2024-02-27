@@ -16,10 +16,6 @@ type ASUser struct {
 }
 
 func (u *ASUser) GenerateAuthKey() string {
-	u.LatestAuthEncrypt--
-	if u.LatestAuthEncrypt <= 0 {
-		u.LatestAuthEncrypt = 255
-	}
 	sha := sha256.Sum256([]byte(u.Passkey + fmt.Sprint(u.LatestAuthEncrypt)))
 	return fmt.Sprintf("%x", sha)
 }
@@ -27,7 +23,7 @@ func (u *ASUser) GenerateAuthKey() string {
 type ASUserList struct {
 	Users  map[string]ASUser `json:"users"`
 	Count  int               `json:"count"`
-	Config *ASConfig         `json:"-"`
+	Server *ASServer         `json:"-"`
 }
 
 const DATA_POINTER = "app-data/userlist.json"
@@ -37,13 +33,18 @@ func LoadUserList(srv *ASServer) *ASUserList {
 	if _, err := os.Stat(DATA_POINTER); err == nil {
 		obj, _ := os.ReadFile(DATA_POINTER)
 		json.Unmarshal(obj, ul)
+		for uuid, user := range ul.Users {
+			user.LatestAuthEncrypt = 255
+			fmt.Println("Loaded User: " + user.UUID + " with authbyte " + fmt.Sprint(user.LatestAuthEncrypt))
+			ul.Users[uuid] = user
+		}
 	} else {
 		ul = &ASUserList{
 			Users: make(map[string]ASUser),
 			Count: 0,
 		}
 	}
-	ul.Config = &srv.Config
+	ul.Server = srv
 	return ul
 }
 
@@ -52,9 +53,16 @@ func SaveUserList(ul *ASUserList) {
 	os.WriteFile(DATA_POINTER, json, 0644)
 }
 
-func (ul *ASUserList) Authorize(uuid string, authkey string) bool {
+func (ul *ASUserList) Authenticate(uuid string, authkey string) bool {
 	if user, ok := ul.Users[uuid]; ok {
+		fmt.Println("PRE Generating AuthKey for " + uuid + ": " + fmt.Sprint(user.LatestAuthEncrypt))
+		if user.LatestAuthEncrypt <= 0 {
+			user.LatestAuthEncrypt = 255 + user.LatestAuthEncrypt
+		}
+		user.LatestAuthEncrypt--
+		fmt.Println("POST Generating AuthKey for " + uuid + ": " + fmt.Sprint(user.LatestAuthEncrypt))
 		expected := user.GenerateAuthKey()
+		ul.Users[uuid] = user
 		if expected == authkey {
 			return true
 		} else {
@@ -66,20 +74,8 @@ func (ul *ASUserList) Authorize(uuid string, authkey string) bool {
 	}
 }
 
-func (ul *ASUserList) CreatePlayerSession(uuid string, authkey string) string {
-	if user, ok := ul.Users[uuid]; ok {
-		session := user.GenerateAuthKey()
-		if session == authkey {
-			return session
-		} else {
-			fmt.Println("Wrong Session Auth.: \"" + session + "\" == \"" + authkey + "\"")
-		}
-	}
-	return ""
-}
-
 func (ul *ASUserList) Push(passkey string) string {
-	uuid := ul.Config.GenerateUUID(ul.Count)
+	uuid := ul.Server.Config.GenerateUUID(ul.Count)
 	ul.Users[uuid] = ASUser{
 		UUID:              uuid,
 		Passkey:           passkey,
@@ -117,7 +113,8 @@ func (ul *ASUserList) AuthRouteHandler() func(http.ResponseWriter, *http.Request
 
 		if user, ok := ul.Users[in_packet.UUID]; ok {
 			user.LatestAuthEncrypt = 255
-			if ul.Authorize(in_packet.UUID, in_packet.Authkey) {
+			ul.Users[in_packet.UUID] = user
+			if ul.Authenticate(in_packet.UUID, in_packet.Authkey) {
 				w.WriteHeader(200)
 			} else {
 				w.WriteHeader(401)
